@@ -5,7 +5,7 @@ import {
   TrashIcon,
   CheckIcon,
   XIcon,
-} from "@heroicons/react/solid";
+} from "lucide-react";
 import {
   useAddTaskMutation,
   useDeleteTaskMutation,
@@ -67,7 +67,7 @@ const TaskManager = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        Loading...
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
@@ -75,7 +75,16 @@ const TaskManager = () => {
   if (isError) {
     return (
       <div className="flex justify-center items-center h-screen">
-        Error loading tasks
+        <div
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+          role="alert"
+        >
+          <strong className="font-bold">Error!</strong>
+          <span className="block sm:inline">
+            {" "}
+            Error loading tasks. Please try again later.
+          </span>
+        </div>
       </div>
     );
   }
@@ -83,59 +92,68 @@ const TaskManager = () => {
   const tasks = tasksData?.data || [];
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-8 text-center">Task Management</h1>
-      <div className="flex justify-end mb-4">
+    <div className="container mx-auto p-6 max-w-7xl">
+      <h1 className="text-4xl font-bold mb-8 text-center text-gray-800">
+        Task Management
+      </h1>
+      <div className="flex justify-end mb-6">
         <button
           onClick={() => {
             setCurrentTask({ title: "", description: "" });
             setIsAddModalOpen(true);
           }}
-          className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out flex items-center"
         >
           <PlusIcon className="h-5 w-5 mr-2" />
           Add New Task
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {tasks.map((task) => (
-          <div key={task._id} className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-2">{task.title}</h2>
-            <p className="text-gray-600 mb-4">{task.description}</p>
-            <div className="flex justify-between items-center">
-              <div className="space-x-2">
+          <div
+            key={task._id}
+            className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden"
+          >
+            <div className="p-6">
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                {task.title}
+              </h2>
+              <p className="text-gray-600 mb-4">{task.description}</p>
+              <div className="flex justify-between items-center">
+                <div className="space-x-2">
+                  <button
+                    onClick={() => {
+                      setCurrentTask(task);
+                      setIsEditModalOpen(true);
+                    }}
+                    className="text-yellow-600 hover:text-yellow-700 p-1 rounded-full hover:bg-yellow-100 transition duration-300"
+                  >
+                    <PencilIcon className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(task._id)}
+                    className="text-red-600 hover:text-red-700 p-1 rounded-full hover:bg-red-100 transition duration-300"
+                  >
+                    <TrashIcon className="h-5 w-5" />
+                  </button>
+                </div>
                 <button
-                  onClick={() => {
-                    setCurrentTask(task);
-                    setIsEditModalOpen(true);
-                  }}
-                  className="text-yellow-500 hover:text-yellow-600"
+                  onClick={() => handleStatusChange(task)}
+                  className={`flex items-center px-3 py-1 rounded-full font-medium ${
+                    task.status === "completed"
+                      ? "text-green-700 bg-green-100 hover:bg-green-200"
+                      : "text-gray-700 bg-gray-100 hover:bg-gray-200"
+                  } transition duration-300`}
                 >
-                  <PencilIcon className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => handleDelete(task._id)}
-                  className="text-red-500 hover:text-red-600"
-                >
-                  <TrashIcon className="h-5 w-5" />
+                  {task.status === "completed" ? (
+                    <CheckIcon className="h-4 w-4 mr-2" />
+                  ) : (
+                    <XIcon className="h-4 w-4 mr-2" />
+                  )}
+                  {task.status === "completed" ? "Completed" : "Pending"}
                 </button>
               </div>
-              <button
-                onClick={() => handleStatusChange(task)}
-                className={`flex items-center ${
-                  task.status === "completed"
-                    ? "text-green-500"
-                    : "text-gray-500"
-                } hover:text-opacity-80`}
-              >
-                {task.status === "completed" ? (
-                  <CheckIcon className="h-5 w-5 mr-1" />
-                ) : (
-                  <XIcon className="h-5 w-5 mr-1" />
-                )}
-                {task.status === "completed" ? "Completed" : "Pending"}
-              </button>
             </div>
           </div>
         ))}
@@ -147,7 +165,7 @@ const TaskManager = () => {
         task={currentTask}
         isEditing={false}
         handleSubmit={handleSubmit}
-        setCurrentTask={setCurrentTask} // Pass setCurrentTask to TaskModal
+        setCurrentTask={setCurrentTask}
       />
 
       <TaskModal
@@ -156,7 +174,7 @@ const TaskManager = () => {
         task={currentTask}
         isEditing={true}
         handleSubmit={handleSubmit}
-        setCurrentTask={setCurrentTask} // Pass setCurrentTask to TaskModal
+        setCurrentTask={setCurrentTask}
       />
     </div>
   );
