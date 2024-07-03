@@ -2,6 +2,10 @@
 
 This is the frontend repository for the TaskManager application.
 
+## Live Demo
+
+Check out the live application [here](https://taskmanager-lyart.vercel.app/).
+
 ## Getting Started
 
 ### Prerequisites
