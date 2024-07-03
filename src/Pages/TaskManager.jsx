@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   PlusIcon,
   PencilIcon,
@@ -67,7 +68,11 @@ const TaskManager = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="h-16 w-16 border-t-4 border-blue-500 rounded-full"
+        />
       </div>
     );
   }
@@ -75,8 +80,10 @@ const TaskManager = () => {
   if (isError) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg shadow-md"
           role="alert"
         >
           <strong className="font-bold">Error!</strong>
@@ -84,7 +91,7 @@ const TaskManager = () => {
             {" "}
             Error loading tasks. Please try again later.
           </span>
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -93,71 +100,101 @@ const TaskManager = () => {
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
-      <h1 className="text-4xl font-bold mb-8 text-center text-gray-800">
+      <motion.h1
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-5xl font-bold mb-12 text-center text-gray-800"
+      >
         Task Management
-      </h1>
-      <div className="flex justify-end mb-6">
-        <button
+      </motion.h1>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex justify-end mb-8"
+      >
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => {
             setCurrentTask({ title: "", description: "" });
             setIsAddModalOpen(true);
           }}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out flex items-center"
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out flex items-center"
         >
           <PlusIcon className="h-5 w-5 mr-2" />
           Add New Task
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tasks.map((task) => (
-          <div
-            key={task._id}
-            className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden"
-          >
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                {task.title}
-              </h2>
-              <p className="text-gray-600 mb-4">{task.description}</p>
-              <div className="flex justify-between items-center">
-                <div className="space-x-2">
-                  <button
-                    onClick={() => {
-                      setCurrentTask(task);
-                      setIsEditModalOpen(true);
-                    }}
-                    className="text-yellow-600 hover:text-yellow-700 p-1 rounded-full hover:bg-yellow-100 transition duration-300"
-                  >
-                    <PencilIcon className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(task._id)}
-                    className="text-red-600 hover:text-red-700 p-1 rounded-full hover:bg-red-100 transition duration-300"
-                  >
-                    <TrashIcon className="h-5 w-5" />
-                  </button>
-                </div>
-                <button
-                  onClick={() => handleStatusChange(task)}
-                  className={`flex items-center px-3 py-1 rounded-full font-medium ${
-                    task.status === "completed"
-                      ? "text-green-700 bg-green-100 hover:bg-green-200"
-                      : "text-gray-700 bg-gray-100 hover:bg-gray-200"
-                  } transition duration-300`}
-                >
-                  {task.status === "completed" ? (
-                    <CheckIcon className="h-4 w-4 mr-2" />
-                  ) : (
-                    <XIcon className="h-4 w-4 mr-2" />
-                  )}
-                  {task.status === "completed" ? "Completed" : "Pending"}
-                </button>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ staggerChildren: 0.1 }}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+      >
+        <AnimatePresence>
+          {tasks.map((task) => (
+            <motion.div
+              key={task._id}
+              layout
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              whileHover={{ y: -5 }}
+              className="bg-white rounded-xl shadow-xl overflow-hidden transform transition-all duration-300 flex flex-col"
+            >
+              <div className="p-6 flex-grow">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-3">
+                  {task.title}
+                </h2>
+                <p className="text-gray-600">{task.description}</p>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
+              <div className="p-6 bg-gray-50 border-t border-gray-100">
+                <div className="flex justify-between items-center">
+                  <div className="space-x-3">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => {
+                        setCurrentTask(task);
+                        setIsEditModalOpen(true);
+                      }}
+                      className="text-yellow-500 hover:text-yellow-600 p-2 rounded-full bg-yellow-100 hover:bg-yellow-200 transition duration-300"
+                    >
+                      <PencilIcon className="h-5 w-5" />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleDelete(task._id)}
+                      className="text-red-500 hover:text-red-600 p-2 rounded-full bg-red-100 hover:bg-red-200 transition duration-300"
+                    >
+                      <TrashIcon className="h-5 w-5" />
+                    </motion.button>
+                  </div>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleStatusChange(task)}
+                    className={`flex items-center px-4 py-2 rounded-full font-medium ${
+                      task.status === "completed"
+                        ? "text-green-700 bg-green-100 hover:bg-green-200"
+                        : "text-gray-700 bg-gray-100 hover:bg-gray-200"
+                    } transition duration-300`}
+                  >
+                    {task.status === "completed" ? (
+                      <CheckIcon className="h-4 w-4 mr-2" />
+                    ) : (
+                      <XIcon className="h-4 w-4 mr-2" />
+                    )}
+                    {task.status === "completed" ? "Completed" : "Pending"}
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </motion.div>
 
       <TaskModal
         isOpen={isAddModalOpen}
